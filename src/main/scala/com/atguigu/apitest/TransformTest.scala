@@ -97,7 +97,7 @@ class MyRichMapper extends RichMapFunction[SensorReading, Int]{
   override def open(parameters: Configuration): Unit = {}
 
 //  getRuntimeContext.getIndexOfThisSubtask
-  
+
   override def map(value: SensorReading): Int = value.timestamp.toInt
 
   override def close(): Unit = {}
