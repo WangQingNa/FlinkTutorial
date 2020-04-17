@@ -19,6 +19,7 @@ object StreamWordCount {
     // 创建流处理执行环境
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 //    env.setParallelism(8)
+//    env.disableOperatorChaining()
 
     // 从程序运行参数中读取hostname和port
     val params: ParameterTool = ParameterTool.fromArgs(args)
@@ -29,11 +30,11 @@ object StreamWordCount {
 
     // 定义转换操作，word count
     val resultDataStream: DataStream[(String, Int)] = inputDataStream
-      .flatMap(_.split(" "))    // 以空格分词，打散得到所有的word
-      .filter(_.nonEmpty)
-      .map( (_, 1) )  // 转换成(word, count)二元组
+      .flatMap(_.split(" "))   // 以空格分词，打散得到所有的word
+      .filter(_.nonEmpty).slotSharingGroup("2")
+      .map( (_, 1) ).disableChaining()  // 转换成(word, count)二元组
       .keyBy(0)  // 按照第一个元素分组
-      .sum(1)  // 按照第二个元素求和
+      .sum(1).startNewChain()  // 按照第二个元素求和
 
     resultDataStream.print().setParallelism(1)
     env.execute("stream word count job")
