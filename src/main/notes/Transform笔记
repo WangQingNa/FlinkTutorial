@@ -1,7 +1,7 @@
 1. keyBy
 基于key的hash code重分区；
 同一个key只能在一个分区内处理，一个分区内可以有不同的key的数据
-keyBy之后的所有操作，针对的作用域都只是当前的key
+keyBy之后的KeyedStream上的所有操作，针对的作用域都只是当前的key
 
 2. 滚动聚合操作
 DataStream没有聚合操作，目前所有的聚合操作都是针对KeyedStream
