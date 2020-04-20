@@ -1,5 +1,6 @@
-package com.atguigu.apitest
+package day4
 
+import com.atguigu.apitest.SensorReading
 import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.{AssignerWithPeriodicWatermarks, AssignerWithPunctuatedWatermarks}
