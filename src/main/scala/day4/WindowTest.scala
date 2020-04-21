@@ -1,7 +1,7 @@
 package day4
 
 import com.atguigu.apitest.SensorReading
-import org.apache.flink.api.java.tuple.Tuple
+import org.apache.flink.api.java.tuple.{Tuple, Tuple1}
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.{AssignerWithPeriodicWatermarks, AssignerWithPunctuatedWatermarks}
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
@@ -40,7 +40,7 @@ object WindowTest {
 //      .assignTimestampsAndWatermarks( new MyWMAssigner(1000L) )
       .assignTimestampsAndWatermarks( new BoundedOutOfOrdernessTimestampExtractor[SensorReading](Time.seconds(1)) {
       override def extractTimestamp(element: SensorReading): Long = element.timestamp * 1000L
-    } )
+    } ).setParallelism(2)
 
     val resultStream = dataStream
       .keyBy("id")
@@ -52,17 +52,18 @@ object WindowTest {
 //      .reduce( new MyReduce() )
       .apply( new MyWindowFun() )
 
-    dataStream.print("data")
+    dataStream.print("data2")
     resultStream.getSideOutput(new OutputTag[SensorReading]("late"))
-    resultStream.print("result")
+    resultStream.print("result2")
     env.execute("window test")
   }
 }
 
 // 自定义一个全窗口函数
-class MyWindowFun() extends WindowFunction[SensorReading, (Long, Int), Tuple, TimeWindow]{
-  override def apply(key: Tuple, window: TimeWindow, input: Iterable[SensorReading], out: Collector[(Long, Int)]): Unit = {
-    out.collect((window.getStart, input.size))
+class MyWindowFun() extends WindowFunction[SensorReading, (String, Long, Int), Tuple, TimeWindow]{
+  override def apply(key: Tuple, window: TimeWindow, input: Iterable[SensorReading], out: Collector[(String, Long, Int)]): Unit = {
+    val id: String = key.asInstanceOf[Tuple1[String]].f0
+    out.collect((id, window.getStart, input.size))
   }
 }
 
