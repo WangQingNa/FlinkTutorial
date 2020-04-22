@@ -1,4 +1,4 @@
-package day5
+package day6
 
 import java.util
 import java.util.concurrent.TimeUnit
@@ -39,7 +39,7 @@ object StateTest {
 
     // checkpoint相关配置
     // 启用检查点，指定触发检查点的间隔时间(毫秒)
-    env.enableCheckpointing(1000L)
+    env.enableCheckpointing(10000L)
     // 其它配置
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
     env.getCheckpointConfig.setCheckpointTimeout(30000L)
