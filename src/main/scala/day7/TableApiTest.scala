@@ -74,9 +74,31 @@ object TableApiTest {
       )
       .createTemporaryTable("kafkaInputTable")
 
+    // 3. 表的查询
+    // 3.1 简单查询，过滤投影
+    val sensorTable: Table = tableEnv.from("inputTable")
+    val resultTable: Table = sensorTable
+      .select('id, 'temperature)
+      .filter('id === "sensor_1")
+    // 3.2 SQL简单查询
+    val resultSqlTable: Table = tableEnv.sqlQuery(
+      """
+        |select id, temperature
+        |from inputTable
+        |where id = 'sensor_1'
+      """.stripMargin)
+
+    // 3.3 简单聚合，统计每个传感器温度个数
+    val aggResultTable: Table = sensorTable
+      .groupBy('id)
+      .select('id, 'id.count as 'count)
+    // 3.4 SQL实现简单聚合
+    val aggResultSqlTable: Table = tableEnv.sqlQuery("select id, count(id) as cnt from inputTable group by id")
+
     // 转换成流打印输出
-    val sensorTable: Table = tableEnv.from("kafkaInputTable")
-    sensorTable.toAppendStream[(String, Long, Double)].print()
+//    val sensorTable: Table = tableEnv.from("kafkaInputTable")
+    resultTable.toAppendStream[(String, Double)].print("result")
+    aggResultSqlTable.toRetractStream[(String, Long)].print("agg")
 
     env.execute("table api test job")
   }

@@ -41,8 +41,10 @@ object TableExample {
       .filter("id == 'sensor_1'")
 
     // 或者直接写sql得到转换结果
+    tableEnv.createTemporaryView("dataTable", dataTable)
+//    tableEnv.registerTable("dataTable", dataTable)
     val resultSqlTable: Table = tableEnv
-      .sqlQuery("select id, temperature from " + dataTable + " where id = 'sensor_1'")
+      .sqlQuery("select id, temperature from dataTable where id = 'sensor_1'")
 
     // 转换回数据流，打印输出
     val resultStream: DataStream[(String, Double)] = resultSqlTable.toAppendStream[(String, Double)]
