@@ -155,7 +155,7 @@ class MyReduceFunction() extends ReduceFunction[SensorReading] {
 }
 
 // operator state示例
-class MyMapper() extends RichMapFunction[SensorReading, Long] with ListCheckpointed[Long]{
+class MyMapper() extends RichMapFunction[SensorReading, Long] with ListCheckpointed[java.lang.Long]{
 //  lazy val countState: ValueState[Long] = getRuntimeContext.getState( new ValueStateDescriptor[Long]("count", classOf[Long]) )
   var count: Long = 0L
   override def map(value: SensorReading): Long = {
@@ -163,18 +163,18 @@ class MyMapper() extends RichMapFunction[SensorReading, Long] with ListCheckpoin
     count
   }
 
-  override def restoreState(state: util.List[Long]): Unit = {
-//    val iter = state.iterator()
-//    while(iter.hasNext){
-//      count += iter.next()
-//    }
-    for( countState <- state ){
-      count += countState
+  override def restoreState(state: util.List[java.lang.Long]): Unit = {
+    val iter = state.iterator()
+    while(iter.hasNext){
+      count += iter.next()
     }
+//    for( countState <- state ){
+//      count += countState
+//    }
   }
 
-  override def snapshotState(checkpointId: Long, timestamp: Long): util.List[Long] = {
-    val stateList = new util.ArrayList[Long]()
+  override def snapshotState(checkpointId: Long, timestamp: Long): util.List[java.lang.Long] = {
+    val stateList = new util.ArrayList[java.lang.Long]()
     stateList.add(count)
     stateList
   }

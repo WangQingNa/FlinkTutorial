@@ -2,7 +2,7 @@ package day4
 
 import com.atguigu.apitest.SensorReading
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
-import org.apache.flink.api.java.tuple.Tuple
+import org.apache.flink.api.java.tuple.{Tuple, Tuple1}
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.util.Collector
@@ -69,6 +69,7 @@ class TempIncreWarning(interval: Long) extends KeyedProcessFunction[Tuple, Senso
 
   // 定时器触发，说明10秒内没有来下降的温度值，报警
   override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[Tuple, SensorReading, String]#OnTimerContext, out: Collector[String]): Unit = {
+    val key = ctx.getCurrentKey.asInstanceOf[Tuple1[String]].f0
     out.collect( "温度值连续" + interval/1000 + "秒上升" )
     curTimerTsState.clear()
   }
